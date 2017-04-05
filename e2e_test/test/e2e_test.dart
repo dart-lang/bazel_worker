@@ -40,8 +40,8 @@ void runE2eTestForWorker(String groupName, SpawnWorker spawnWorker) {
   });
 }
 
-/// Runs [count] of work requests through [driver], and asserts that they
-/// all completed with the correct response.
+/// Runs [count] work requests through [driver], and asserts that they all
+/// completed with the correct response.
 Future _doRequests(BazelWorkerDriver driver, {int count}) async {
   count ??= 100;
   var requests = new List.generate(count, (requestNum) {
