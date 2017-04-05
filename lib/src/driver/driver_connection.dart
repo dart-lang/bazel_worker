@@ -3,10 +3,12 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import '../async_message_grouper.dart';
 import '../worker_protocol.pb.dart';
+import '../constants.dart';
 import '../utils.dart';
 
 /// A connection from a `BazelWorkerDriver` to a worker.
@@ -40,7 +42,24 @@ class StdDriverConnection implements DriverConnection {
     var buffer = await _messageGrouper.next;
     if (buffer == null) return null;
 
-    return new WorkResponse.fromBuffer(buffer);
+    WorkResponse response;
+    try {
+      response = new WorkResponse.fromBuffer(buffer);
+    } catch (_) {
+      try {
+        // Try parsing the message as a string and set that as the output.
+        var output = UTF8.decode(buffer);
+        var response = new WorkResponse()
+          ..exitCode = EXIT_CODE_ERROR
+          ..output = 'Worker sent an invalid response:\n$output';
+        return response;
+      } catch (_) {
+        // Fall back to original exception and rethrow if we fail to parse as
+        // a string.
+      }
+      rethrow;
+    }
+    return response;
   }
 
   @override
