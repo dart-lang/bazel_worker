@@ -37,6 +37,12 @@ class StdDriverConnection implements DriverConnection {
       new StdDriverConnection(
           inputStream: worker.stdout, outputStream: worker.stdin);
 
+  /// Note: This will attempts to recover from invalid proto messages by parsing
+  /// them as strings. This is a common error case for workers (they print a
+  /// message to stdout on accident). This isn't perfect however as it only
+  /// happens if the parsing throws, you can still hang indefinitely if the
+  /// [MessageGrouper] doesn't find what it thinks is the end of a proto
+  /// message.
   @override
   Future<WorkResponse> readResponse() async {
     var buffer = await _messageGrouper.next;
