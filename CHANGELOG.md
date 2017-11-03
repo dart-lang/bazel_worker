@@ -1,4 +1,4 @@
-## 0.2.0
+## 0.1.5
 
 * Change TestStdinAsync.controller to StreamController<List<int>> (instead of
   using dynamic as the type argument).
