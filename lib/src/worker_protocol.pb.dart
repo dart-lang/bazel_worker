@@ -116,7 +116,7 @@ class WorkResponse extends GeneratedMessage {
 
   int get exitCode => $_get(0, 0);
   set exitCode(int v) {
-    $_setUnsignedInt32(0, v);
+    $_setSignedInt32(0, v);
   }
 
   bool hasExitCode() => $_has(0);
