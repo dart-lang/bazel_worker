@@ -1,6 +1,6 @@
 ## 0.1.17
 
-* Allow protobuf 0.12.0.
+* Allow protobuf 0.13.0.
 
 ## 0.1.16
 
