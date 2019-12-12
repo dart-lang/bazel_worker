@@ -1,7 +1,6 @@
 include: package:pedantic/analysis_options.yaml
 
 analyzer:
-  exclude: ['lib/src/worker_protocol.pb.dart']
 
 linter:
   rules:
