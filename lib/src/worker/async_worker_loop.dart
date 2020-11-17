@@ -20,14 +20,14 @@ abstract class AsyncWorkerLoop implements WorkerLoop {
 
   /// Perform a single [WorkRequest], and return a [WorkResponse].
   @override
-  Future<WorkResponse?> performRequest(WorkRequest request);
+  Future<WorkResponse> performRequest(WorkRequest request);
 
   /// Run the worker loop. The returned [Future] doesn't complete until
   /// [connection#readRequest] returns `null`.
   @override
   Future run() async {
     while (true) {
-      WorkResponse? response;
+      late WorkResponse response;
       try {
         var request = await connection.readRequest();
         if (request == null) break;
@@ -39,7 +39,7 @@ abstract class AsyncWorkerLoop implements WorkerLoop {
           printMessages.write(message);
         }));
         if (printMessages.isNotEmpty) {
-          response!.output = '${response.output}$printMessages';
+          response.output = '${response.output}$printMessages';
         }
       } catch (e, s) {
         response = WorkResponse()
@@ -47,7 +47,7 @@ abstract class AsyncWorkerLoop implements WorkerLoop {
           ..output = '$e\n$s';
       }
 
-      connection.writeResponse(response!);
+      connection.writeResponse(response);
     }
   }
 }

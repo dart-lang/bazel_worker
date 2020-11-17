@@ -21,7 +21,7 @@ class ForwardsToIsolateAsyncWorker extends AsyncWorkerLoop {
   ForwardsToIsolateAsyncWorker(this._isolateDriverConnection);
 
   @override
-  Future<WorkResponse?> performRequest(WorkRequest request) {
+  Future<WorkResponse> performRequest(WorkRequest request) {
     _isolateDriverConnection.writeRequest(request);
     return _isolateDriverConnection.readResponse();
   }

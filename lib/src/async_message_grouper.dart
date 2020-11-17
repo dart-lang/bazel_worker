@@ -56,10 +56,10 @@ class AsyncMessageGrouper implements MessageGrouper {
   }
 
   /// Stop listening to the stream for further updates.
-  Future? cancel() {
+  Future cancel() {
     if (!_done.isCompleted) {
       _done.complete(null);
-      return _inputQueue.cancel();
+      return _inputQueue.cancel()!;
     }
     return done;
   }

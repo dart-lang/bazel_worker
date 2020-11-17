@@ -105,7 +105,6 @@ class BazelWorkerDriver {
       futureWorker.then((worker) {
         _spawningWorkers.remove(futureWorker);
         _readyWorkers.add(worker);
-
         var connection = StdDriverConnection.forWorker(worker);
         _workerConnections[worker] = connection;
         _runWorker(worker, attempt);
@@ -147,7 +146,7 @@ class BazelWorkerDriver {
       // It is possible for us to complete with an error response due to an
       // unhandled async error before we get here.
       if (!attempt.responseCompleter.isCompleted) {
-        if (response == null) {
+        if (response.exitCode == EXIT_CODE_BROKEN_PIPE) {
           rescheduled = _tryReschedule(attempt);
           if (rescheduled) return;
           stderr.writeln('Failed to run request ${attempt.request}');

@@ -13,6 +13,10 @@ import 'package:bazel_worker/driver.dart';
 
 void main() {
   BazelWorkerDriver? driver;
+  final disconnectedResponse = WorkResponse()
+    ..exitCode = EXIT_CODE_BROKEN_PIPE
+    ..output = 'Connection closed'
+    ..freeze();
 
   group('basic driver', () {
     test('can run a single request', () async {
@@ -109,7 +113,8 @@ void main() {
       test('should retry up to maxRetries times', () async {
         createDriver();
         var expectedResponse = WorkResponse();
-        MockWorker.responseQueue.addAll([null, null, expectedResponse]);
+        MockWorker.responseQueue.addAll(
+            [disconnectedResponse, disconnectedResponse, expectedResponse]);
         var actualResponse = await driver!.doWork(WorkRequest());
         // The first 2 null responses are thrown away, and we should get the
         // third one.
@@ -121,7 +126,8 @@ void main() {
 
       test('should fail if it exceeds maxRetries failures', () async {
         createDriver(maxRetries: 2, numBadWorkers: 3);
-        MockWorker.responseQueue.addAll([null, null, WorkResponse()]);
+        MockWorker.responseQueue.addAll(
+            [disconnectedResponse, disconnectedResponse, WorkResponse()]);
         var actualResponse = await driver!.doWork(WorkRequest());
         // Should actually get a bad response.
         expect(actualResponse.exitCode, 15);
@@ -147,12 +153,11 @@ void main() {
 /// all completed.
 Future _doRequests(
     {BazelWorkerDriver? driver,
-    int? count,
+    int count = 100,
     Function(Future<WorkResponse?>)? trackWork}) async {
   // If we create a driver, we need to make sure and terminate it.
   var terminateDriver = driver == null;
   driver ??= BazelWorkerDriver(MockWorker.spawn);
-  count ??= 100;
   var requests = List.generate(count, (_) => WorkRequest());
   var responses = List.generate(count, (_) => WorkResponse());
   MockWorker.responseQueue.addAll(responses);
@@ -166,13 +171,13 @@ Future _doRequests(
 ///
 /// Throws if it runs out of responses.
 class MockWorkerLoop extends AsyncWorkerLoop {
-  final Queue<WorkResponse?> _responseQueue;
+  final Queue<WorkResponse> _responseQueue;
 
   MockWorkerLoop(this._responseQueue, {AsyncWorkerConnection? connection})
       : super(connection: connection);
 
   @override
-  Future<WorkResponse?> performRequest(WorkRequest request) async {
+  Future<WorkResponse> performRequest(WorkRequest request) async {
     print('Performing request $request');
     return _responseQueue.removeFirst();
   }
@@ -182,7 +187,7 @@ class MockWorkerLoop extends AsyncWorkerLoop {
 class ThrowingMockWorkerLoop extends MockWorkerLoop {
   final MockWorker _mockWorker;
 
-  ThrowingMockWorkerLoop(this._mockWorker, Queue<WorkResponse?> responseQueue,
+  ThrowingMockWorkerLoop(this._mockWorker, Queue<WorkResponse> responseQueue,
       AsyncWorkerConnection connection)
       : super(responseQueue, connection: connection);
 
@@ -211,7 +216,7 @@ class MockWorker implements Process {
   /// Static queue of pending responses, these are shared by all workers.
   ///
   /// If this is empty and a request is received then it will throw.
-  static final responseQueue = Queue<WorkResponse?>();
+  static final responseQueue = Queue<WorkResponse>();
 
   /// Static list of all live workers.
   static final liveWorkers = <MockWorker>[];
@@ -244,12 +249,7 @@ class MockWorker implements Process {
   final _stderrController = StreamController<List<int>>();
 
   @override
-  IOSink get stdin {
-    _stdin ??= IOSink(_stdinController.sink);
-    return _stdin!;
-  }
-
-  IOSink? _stdin;
+  late final IOSink stdin = IOSink(_stdinController.sink);
   final _stdinController = StreamController<List<int>>();
 
   @override

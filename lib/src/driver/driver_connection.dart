@@ -18,7 +18,7 @@ import '../utils.dart';
 /// This is because drivers talk to multiple workers, so they should never block
 /// when waiting for the response of any individual worker.
 abstract class DriverConnection {
-  Future<WorkResponse?> readResponse();
+  Future<WorkResponse> readResponse();
 
   void writeRequest(WorkRequest request);
 
@@ -48,9 +48,13 @@ class StdDriverConnection implements DriverConnection {
   /// [MessageGrouper] doesn't find what it thinks is the end of a proto
   /// message.
   @override
-  Future<WorkResponse?> readResponse() async {
+  Future<WorkResponse> readResponse() async {
     var buffer = await _messageGrouper.next;
-    if (buffer == null) return null;
+    if (buffer == null) {
+      return WorkResponse()
+        ..exitCode = EXIT_CODE_BROKEN_PIPE
+        ..output = 'Connection to worker closed';
+    }
 
     WorkResponse response;
     try {
@@ -102,9 +106,11 @@ class IsolateDriverConnection implements DriverConnection {
   }
 
   @override
-  Future<WorkResponse?> readResponse() async {
+  Future<WorkResponse> readResponse() async {
     if (!await _receivePortIterator.moveNext()) {
-      return null;
+      return WorkResponse()
+        ..exitCode = EXIT_CODE_BROKEN_PIPE
+        ..output = 'Connection to worker closed.';
     }
     return WorkResponse.fromBuffer(_receivePortIterator.current as List<int>);
   }

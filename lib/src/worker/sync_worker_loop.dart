@@ -19,13 +19,13 @@ abstract class SyncWorkerLoop implements WorkerLoop {
 
   /// Perform a single [WorkRequest], and return a [WorkResponse].
   @override
-  WorkResponse? performRequest(WorkRequest request);
+  WorkResponse performRequest(WorkRequest request);
 
   /// Run the worker loop. Blocks until [connection#readRequest] returns `null`.
   @override
   void run() {
     while (true) {
-      WorkResponse? response;
+      late WorkResponse response;
       try {
         var request = connection.readRequest();
         if (request == null) break;
@@ -36,7 +36,7 @@ abstract class SyncWorkerLoop implements WorkerLoop {
           printMessages.write(message);
         }));
         if (printMessages.isNotEmpty) {
-          response!.output = '${response.output}$printMessages';
+          response.output = '${response.output}$printMessages';
         }
       } catch (e, s) {
         response = WorkResponse()
@@ -44,7 +44,7 @@ abstract class SyncWorkerLoop implements WorkerLoop {
           ..output = '$e\n$s';
       }
 
-      connection.writeResponse(response!);
+      connection.writeResponse(response);
     }
   }
 }
