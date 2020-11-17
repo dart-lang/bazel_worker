@@ -15,19 +15,19 @@ import 'worker_loop.dart';
 abstract class AsyncWorkerLoop implements WorkerLoop {
   final AsyncWorkerConnection connection;
 
-  AsyncWorkerLoop({AsyncWorkerConnection connection})
+  AsyncWorkerLoop({AsyncWorkerConnection? connection})
       : connection = connection ?? StdAsyncWorkerConnection();
 
   /// Perform a single [WorkRequest], and return a [WorkResponse].
   @override
-  Future<WorkResponse> performRequest(WorkRequest request);
+  Future<WorkResponse?> performRequest(WorkRequest request);
 
   /// Run the worker loop. The returned [Future] doesn't complete until
   /// [connection#readRequest] returns `null`.
   @override
   Future run() async {
     while (true) {
-      WorkResponse response;
+      WorkResponse? response;
       try {
         var request = await connection.readRequest();
         if (request == null) break;
@@ -39,17 +39,15 @@ abstract class AsyncWorkerLoop implements WorkerLoop {
           printMessages.write(message);
         }));
         if (printMessages.isNotEmpty) {
-          response.output = '${response.output}$printMessages';
+          response!.output = '${response.output}$printMessages';
         }
-        // In case they forget to set this.
-        response.exitCode ??= EXIT_CODE_OK;
       } catch (e, s) {
         response = WorkResponse()
           ..exitCode = EXIT_CODE_ERROR
           ..output = '$e\n$s';
       }
 
-      connection.writeResponse(response);
+      connection.writeResponse(response!);
     }
   }
 }

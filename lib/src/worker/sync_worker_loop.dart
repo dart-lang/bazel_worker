@@ -14,18 +14,18 @@ import 'worker_loop.dart';
 abstract class SyncWorkerLoop implements WorkerLoop {
   final SyncWorkerConnection connection;
 
-  SyncWorkerLoop({SyncWorkerConnection connection})
+  SyncWorkerLoop({SyncWorkerConnection? connection})
       : connection = connection ?? StdSyncWorkerConnection();
 
   /// Perform a single [WorkRequest], and return a [WorkResponse].
   @override
-  WorkResponse performRequest(WorkRequest request);
+  WorkResponse? performRequest(WorkRequest request);
 
   /// Run the worker loop. Blocks until [connection#readRequest] returns `null`.
   @override
   void run() {
     while (true) {
-      WorkResponse response;
+      WorkResponse? response;
       try {
         var request = connection.readRequest();
         if (request == null) break;
@@ -36,17 +36,15 @@ abstract class SyncWorkerLoop implements WorkerLoop {
           printMessages.write(message);
         }));
         if (printMessages.isNotEmpty) {
-          response.output = '${response.output}$printMessages';
+          response!.output = '${response.output}$printMessages';
         }
-        // In case they forget to set this.
-        response.exitCode ??= EXIT_CODE_OK;
       } catch (e, s) {
         response = WorkResponse()
           ..exitCode = EXIT_CODE_ERROR
           ..output = '$e\n$s';
       }
 
-      connection.writeResponse(response);
+      connection.writeResponse(response!);
     }
   }
 }
