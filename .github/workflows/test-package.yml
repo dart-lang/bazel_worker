@@ -14,7 +14,7 @@ env:
 
 jobs:
   # Run the test script against the latest dev build.
-  analyze:
+  test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
