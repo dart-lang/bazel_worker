@@ -1,7 +1,7 @@
 ## 1.0.0-nullsafety.1
 
 * Improve `AsyncMessageGrouper` performance.
-* Add `bin/benchmark.dart` measuring `AsyncMessageGrouper` performance.
+* Add `benchmark/benchmark.dart` measuring `AsyncMessageGrouper` performance.
 
 ## 1.0.0-nullsafety.0
 

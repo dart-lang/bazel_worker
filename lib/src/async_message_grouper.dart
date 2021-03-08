@@ -19,10 +19,10 @@ class AsyncMessageGrouper implements MessageGrouper {
   final StreamQueue<List<int>> _inputQueue;
 
   /// The current input buffer.
-  List<int> _buffer = [];
+  List<int> _inputBuffer = [];
 
   /// Position in the current input buffer.
-  int _bufferPos = 0;
+  int _inputBufferPos = 0;
 
   /// Completes after [cancel] is called or [inputStream] is closed.
   Future<void> get done => _done.future;
@@ -49,20 +49,21 @@ class AsyncMessageGrouper implements MessageGrouper {
   Future<List<int>?> get next async {
     try {
       // Loop while there is data in the input buffer or the input stream.
-      while (_bufferPos != _buffer.length || await _inputQueue.hasNext) {
+      while (
+          _inputBufferPos != _inputBuffer.length || await _inputQueue.hasNext) {
         // If the input buffer is empty fill it from the input stream.
-        if (_bufferPos == _buffer.length) {
-          _buffer = await _inputQueue.next;
-          _bufferPos = 0;
+        if (_inputBufferPos == _inputBuffer.length) {
+          _inputBuffer = await _inputQueue.next;
+          _inputBufferPos = 0;
         }
 
         // Loop over the input buffer. Might return without reading the full
         // buffer if a message completes. Then, this is tracked in
-        // `_bufferPos`.
-        while (_bufferPos != _buffer.length) {
+        // `_inputBufferPos`.
+        while (_inputBufferPos != _inputBuffer.length) {
           if (_readingLength) {
             // Reading message length byte by byte.
-            var byte = _buffer[_bufferPos++];
+            var byte = _inputBuffer[_inputBufferPos++];
             _lengthBuffer.add(byte);
             // Check for the last byte in the length, and then read it.
             if ((byte & 0x80) == 0) {
@@ -86,12 +87,15 @@ class AsyncMessageGrouper implements MessageGrouper {
             // Copy as much as possible from the input buffer. Limit is the
             // smaller of the remaining length to fill in the message and the
             // remaining length in the buffer.
-            var lengthToCopy =
-                min(_message.length - _messagePos, _buffer.length - _bufferPos);
-            _message.setRange(_messagePos, _messagePos + lengthToCopy,
-                _buffer.sublist(_bufferPos, _bufferPos + lengthToCopy));
+            var lengthToCopy = min(_message.length - _messagePos,
+                _inputBuffer.length - _inputBufferPos);
+            _message.setRange(
+                _messagePos,
+                _messagePos + lengthToCopy,
+                _inputBuffer.sublist(
+                    _inputBufferPos, _inputBufferPos + lengthToCopy));
             _messagePos += lengthToCopy;
-            _bufferPos += lengthToCopy;
+            _inputBufferPos += lengthToCopy;
 
             // If there is a complete message to return, return it and switch
             // back to reading length.
