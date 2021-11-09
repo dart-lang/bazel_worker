@@ -6,9 +6,13 @@ import 'package:path/path.dart' as p;
 void main() async {
   var scratchSpace = await Directory.systemTemp.createTemp();
   var driver = BazelWorkerDriver(
-      () => Process.start(
-          Platform.resolvedExecutable, [p.join('example', 'worker.dart')],
+      () => Process.start(Platform.resolvedExecutable,
+          [p.join(p.absolute(p.current), 'example', 'worker.dart')],
           workingDirectory: scratchSpace.path),
       maxWorkers: 4);
-  driver.doWork(WorkRequest()..arguments.add('foo'));
+  var response = await driver.doWork(WorkRequest()..arguments.add('foo'));
+  if (response.exitCode != EXIT_CODE_OK) {
+    print('Worker request failed');
+  }
+  await driver.terminateWorkers();
 }
