@@ -22,5 +22,5 @@ pub run test
 pushd e2e_test
 pub get
 dart analyze --fatal-infos test/e2e_test.dart
-pub run test
+dart pub run test
 popd
