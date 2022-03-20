@@ -7,7 +7,7 @@
 # Fast fail the script on failures.
 set -e
 
-pub get
+dart pub get
 
 # Verify that the libraries are error free.
 dart analyze --fatal-infos \
