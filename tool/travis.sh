@@ -20,7 +20,7 @@ dart analyze --fatal-infos \
 pub run test
 
 pushd e2e_test
-pub get
+dart pub get
 dart analyze --fatal-infos test/e2e_test.dart
-dart pub run test
+dart test
 popd
