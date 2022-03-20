@@ -17,7 +17,7 @@ dart analyze --fatal-infos \
   test/test_all.dart
 
 # Run the tests.
-pub run test
+dart test
 
 pushd e2e_test
 dart pub get
