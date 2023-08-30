@@ -1,3 +1,7 @@
+## 1.0.4-wip
+
+* Include comments on the generated worker protocol API.
+
 ## 1.0.3
 
 * Require `package:protobuf` >= 3.0.0.
