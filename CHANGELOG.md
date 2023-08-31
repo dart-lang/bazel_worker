@@ -1,4 +1,4 @@
-## 1.0.4-wip
+## 1.1.0
 
 * Add constructors with named parameters to
   the generated worker protocol messages.
