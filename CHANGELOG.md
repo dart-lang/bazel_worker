@@ -1,5 +1,7 @@
 ## 1.0.4-wip
 
+* Add constructors with named parameters to
+  the generated worker protocol messages.
 * Include comments on the generated worker protocol API.
 
 ## 1.0.3

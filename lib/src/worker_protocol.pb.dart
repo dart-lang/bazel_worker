@@ -15,7 +15,19 @@ import 'package:protobuf/protobuf.dart' as $pb;
 
 /// An input file.
 class Input extends $pb.GeneratedMessage {
-  factory Input() => create();
+  factory Input({
+    $core.String? path,
+    $core.List<$core.int>? digest,
+  }) {
+    final $result = create();
+    if (path != null) {
+      $result.path = path;
+    }
+    if (digest != null) {
+      $result.digest = digest;
+    }
+    return $result;
+  }
   Input._() : super();
   factory Input.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -88,7 +100,35 @@ class Input extends $pb.GeneratedMessage {
 
 /// This represents a single work unit that Blaze sends to the worker.
 class WorkRequest extends $pb.GeneratedMessage {
-  factory WorkRequest() => create();
+  factory WorkRequest({
+    $core.Iterable<$core.String>? arguments,
+    $core.Iterable<Input>? inputs,
+    $core.int? requestId,
+    $core.bool? cancel,
+    $core.int? verbosity,
+    $core.String? sandboxDir,
+  }) {
+    final $result = create();
+    if (arguments != null) {
+      $result.arguments.addAll(arguments);
+    }
+    if (inputs != null) {
+      $result.inputs.addAll(inputs);
+    }
+    if (requestId != null) {
+      $result.requestId = requestId;
+    }
+    if (cancel != null) {
+      $result.cancel = cancel;
+    }
+    if (verbosity != null) {
+      $result.verbosity = verbosity;
+    }
+    if (sandboxDir != null) {
+      $result.sandboxDir = sandboxDir;
+    }
+    return $result;
+  }
   WorkRequest._() : super();
   factory WorkRequest.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
@@ -215,7 +255,27 @@ class WorkRequest extends $pb.GeneratedMessage {
 /// The worker sends this message to Blaze when it finished its work on the
 /// WorkRequest message.
 class WorkResponse extends $pb.GeneratedMessage {
-  factory WorkResponse() => create();
+  factory WorkResponse({
+    $core.int? exitCode,
+    $core.String? output,
+    $core.int? requestId,
+    $core.bool? wasCancelled,
+  }) {
+    final $result = create();
+    if (exitCode != null) {
+      $result.exitCode = exitCode;
+    }
+    if (output != null) {
+      $result.output = output;
+    }
+    if (requestId != null) {
+      $result.requestId = requestId;
+    }
+    if (wasCancelled != null) {
+      $result.wasCancelled = wasCancelled;
+    }
+    return $result;
+  }
   WorkResponse._() : super();
   factory WorkResponse.fromBuffer($core.List<$core.int> i,
           [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
