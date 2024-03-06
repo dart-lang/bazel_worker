@@ -140,8 +140,7 @@ void main() {
     });
 
     test('handles spawnWorker failures', () async {
-      driver = BazelWorkerDriver(
-          () => Future.error(StateError('oh no!'), StackTrace.current),
+      driver = BazelWorkerDriver(() async => throw StateError('oh no!'),
           maxRetries: 0);
       expect(driver!.doWork(WorkRequest()), throwsA(isA<StateError>()));
     });
