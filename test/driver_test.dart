@@ -139,6 +139,12 @@ void main() {
       });
     });
 
+    test('handles spawnWorker failures', () async {
+      driver = BazelWorkerDriver(() async => throw StateError('oh no!'),
+          maxRetries: 0);
+      expect(await driver!.doWork(WorkRequest()), completes);
+    });
+
     tearDown(() async {
       await driver?.terminateWorkers();
       expect(MockWorker.liveWorkers, isEmpty);
