@@ -120,10 +120,10 @@ class BazelWorkerDriver {
           _readyWorkers.remove(worker);
           _runWorkQueue();
         });
-      }).catchError((Object e, StackTrace? s) {
+      }).onError((e, s) {
         _spawningWorkers.remove(futureWorker);
         if (attempt.responseCompleter.isCompleted) return;
-        attempt.responseCompleter.completeError(e, s);
+        attempt.responseCompleter.completeError(e ?? 'null', s);
       });
     }
     // Recursively calls itself until one of the bail out conditions are met.
