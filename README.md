@@ -1,3 +1,6 @@
+> [!IMPORTANT]  
+> This repo has moved to https://github.com/dart-lang/tools/tree/main/pkgs/bazel_worker
+
 Tools for creating a persistent worker loop for [bazel](https://bazel.build/).
 
 ## Usage
