@@ -10,4 +10,4 @@ analyzer:
 
 linter:
   rules:
-    - package_api_docs
+    []
